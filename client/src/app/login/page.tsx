@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/utils/api';
 
@@ -9,7 +9,38 @@ export default function LoginPage() {
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [checking, setChecking] = useState<boolean>(true); // 👈 Added checking state
   const router = useRouter();
+
+  // 🛡️ Protect login route and prevent form flash
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+
+    if (token && userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user.role === 'STUDENT') {
+          router.replace('/student');
+        } else {
+          router.replace('/staff');
+        }
+      } catch (e) {
+        router.replace('/staff');
+      }
+    } else {
+      setChecking(false); // Safe to display login form
+    }
+  }, [router]);
+
+  // 🛑 Show blank/loading screen while verifying session to prevent blinking
+  if (checking) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-100 to-indigo-50/30">
+        <div className="text-xs text-slate-400">Verifying session...</div>
+      </div>
+    );
+  }
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

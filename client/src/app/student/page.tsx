@@ -24,17 +24,37 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  
+  // 🛡️ Added mounting state to prevent hydration mismatches with localStorage
+  const [mounted, setMounted] = useState<boolean>(false);
+  const [user, setUser] = useState<any>({});
 
   const router = useRouter();
-  const user = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || '{}') : {};
 
   useEffect(() => {
-    if (!user || user.role !== 'STUDENT') {
+    setMounted(true);
+    const userStr = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+
+    if (!token || !userStr) {
       router.push('/login');
       return;
     }
+
+    try {
+      const parsedUser = JSON.parse(userStr);
+      if (parsedUser.role !== 'STUDENT') {
+        router.push('/login');
+        return;
+      }
+      setUser(parsedUser);
+    } catch (e) {
+      router.push('/login');
+      return;
+    }
+
     fetchTickets();
-  }, []);
+  }, [router]);
 
   const fetchTickets = async () => {
     try {
@@ -66,7 +86,9 @@ export default function StudentDashboard() {
             </button>
             <div>
               <h1 className="text-sm font-bold text-white tracking-tight">Student Support Portal</h1>
-              <p className="text-[11px] text-slate-400 font-medium">Welcome back, {user?.name}</p>
+              <p className="text-[11px] text-slate-400 font-medium">
+                Welcome back, {mounted && user?.name ? user.name : 'Student'}
+              </p>
             </div>
           </div>
         </header>

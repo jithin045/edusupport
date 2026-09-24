@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
   LuTicket, 
@@ -21,6 +22,11 @@ interface SidebarProps {
 export default function Sidebar({ user, isOpen = false, onClose }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -29,6 +35,8 @@ export default function Sidebar({ user, isOpen = false, onClose }: SidebarProps)
 
   const isStaffOrManager = user?.role === 'STAFF' || user?.role === 'MANAGER';
   const dashboardRoute = isStaffOrManager ? '/staff' : '/student';
+
+  const initials = mounted && user?.name ? user.name.substring(0, 2).toUpperCase() : 'U';
 
   return (
     <>
@@ -91,11 +99,11 @@ export default function Sidebar({ user, isOpen = false, onClose }: SidebarProps)
         <div className="p-4 border-t border-slate-800 bg-slate-950/40 m-4 rounded-2xl space-y-3">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 font-bold text-xs flex items-center justify-center shrink-0">
-              {user?.name ? user.name.substring(0, 2).toUpperCase() : 'U'}
+              {initials}
             </div>
             <div className="overflow-hidden">
-              <p className="text-xs font-bold text-white truncate">{user?.name || 'User'}</p>
-              <p className="text-[10px] text-indigo-400 font-semibold uppercase tracking-wider truncate">{user?.role}</p>
+              <p className="text-xs font-bold text-white truncate">{mounted && user?.name ? user.name : 'User'}</p>
+              <p className="text-[10px] text-indigo-400 font-semibold uppercase tracking-wider truncate">{mounted && user?.role ? user.role : ''}</p>
             </div>
           </div>
 

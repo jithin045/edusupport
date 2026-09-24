@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Production Build Output
+dist/
+
+# Environment Variables (Crucial!)
+.env
+
+# OS Files
+.DS_Store

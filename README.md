@@ -102,6 +102,6 @@ npm run dev
 Open http://localhost:3000 in your browser.
 
 🌐 Live Deployment Links
-Live Frontend (Vercel): https://your-frontend-url.vercel.app
+Live Frontend (Vercel): https://edusupport-seven.vercel.app
 
 Live Backend (Render): https://edusupport-server.onrender.com
